@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Flavours of India</title>
+  <meta name="description" content="Flavours of India — traditional & modern Indian recipes with photos, regional map, gallery and step-by-step instructions." />
+  <style>
+    html{
+      scroll-behavior: smooth;
+    }
+    :root{
+      --accent:#C6532D; /* saffron-like */
+      --accent-2:#F2C94C; /* turmeric */
+      --muted:#6b6b6b;
+      --bg:#fffdf9;
+      --card:#ffffff;
+      --radius:16px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:#222;line-height:1.5}
+    header{backdrop-filter: blur(6px);position:sticky;top:0;z-index:40;background:linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.6));border-bottom:1px solid #eee}
+    .container{max-width:1100px;margin:0 auto;padding:24px}
+    .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;}
+    .logo{display:flex;align-items:center;gap:12px;font-weight:700;font-size:18px;color:var(--accent)}
+    .logo .spice{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#F2994A,#C94A2C);display:flex;align-items:center;justify-content:center;color:white;font-weight:800}
+    nav ul{display:flex;gap:18px;list-style:none;margin:0;padding:0;}
+    nav a{color:#333;text-decoration:none;padding:8px 10px;border-radius:8px;}
+    nav a:hover{background:#fff5eb}
+    .cta{background:var(--accent);color:white;padding:8px 14px;border-radius:10px;text-decoration:none}
+
+    /* Hero */
+    .hero{display:grid;grid-template-columns:1fr;gap:20px;padding:48px 0}
+    .hero-inner{display:flex;flex-direction:column;gap:16px}
+    .hero h1{font-size:34px;margin:0}
+    .hero p.lead{color:var(--muted);max-width:70%}
+
+    .hero-image{border-radius:18px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.08)}
+    .hero-image img{width:100%;height:100%;object-fit:cover;display:block}
+
+    /* Regions */
+    .regions{display:grid;grid-template-columns:1fr;gap:24px;margin:40px 0}
+    .map-grid{display:grid;grid-template-columns:1fr;gap:20px;align-items:start}
+    .map-placeholder{border-radius:12px;padding:18px;background:linear-gradient(180deg,#fffaf2,#fffdf9);border:1px solid #f3e7e0}
+    .region-cards{display:flex;gap:12px;flex-wrap:wrap}
+    .region{background:var(--card);padding:12px;border-radius:12px;min-width:160px;box-shadow:0 4px 14px rgba(12,12,12,0.04);cursor:pointer}
+    .region img{width:100%;height:110px;object-fit:cover;border-radius:8px}
+    .region h4{margin:8px 0 4px}
+    .dish-list{color:var(--muted);font-size:14px}
+
+    /* Popular */
+    .popular{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+    .card{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.05)}
+    .card img{width:100%;height:150px;object-fit:cover;border-radius:10px;background-color:#C6532D}
+    .rating{display:flex;gap:6px;align-items:center;margin-top:8px}
+
+    /* Gallery */
+    .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+    .gallery-item{position:relative;border-radius:10px;overflow:hidden}
+    .gallery-item img{width:100%;height:160px;object-fit:cover;display:block;transition:transform .4s}
+    .gallery-item:hover img{transform:scale(1.06)}
+    .gallery-item .caption{position:absolute;left:8px;bottom:8px;padding:6px 8px;background:rgba(0,0,0,0.45);color:white;border-radius:8px;font-size:13px}
+
+    /* Footer */
+    footer{padding:28px 0;background:#fff}
+    .footer-grid{display:grid;grid-template-columns:1fr 220px;gap:18px}
+    .socials{display:flex;gap:10px;height:50px;width: 50;border-radius: 50%;}
+
+    /* Modal / recipe details */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;padding:28px;z-index:60}
+    .modal.open{display:flex}
+    .modal-card{max-width:900px;width:100%;background:white;border-radius:16px;overflow:auto;max-height:90vh;padding:18px}
+    .modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .ingredients{background:#fff8f2;padding:12px;border-radius:10px}
+    .meta{display:flex;gap:12px;flex-wrap:wrap;color:var(--muted)}
+
+    /* Contact */
+    form{display:grid;gap:10px}
+    input,textarea{padding:10px;border-radius:8px;border:1px solid #e6e6e6}
+    button{background:var(--accent);color:white;padding:10px;border-radius:10px;border:none;cursor:pointer}
+
+    @media(min-width:800px){
+      .hero{grid-template-columns:1fr 420px}
+      .map-grid{grid-template-columns:420px 1fr}
+      .modal-grid{grid-template-columns:1fr 1fr}
+    }
+
+    @media(max-width:480px){
+      .logo{font-size:15px}
+      .hero h1{font-size:22px}
+      .hero p.lead{max-width:100%}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <div class="logo"><div class="spice">FI</div>Flavours of India</div>
+      <nav>
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#regions">Regional Recipes</a></li>
+          <li><a href="#popular">Popular Dishes</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <a class="cta" href="#subscribe">Subscribe</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="home" class="hero">
+      <div class="hero-inner">
+        <h1>Discover the taste of India in every bite</h1>
+        <p class="lead">From spicy curries to delicate sweets — Flavours of India brings a handpicked collection of authentic regional recipes as well as modern twists. Browse by region, see HD photos, and follow step-by-step instructions.</p>
+        <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap">
+          <a class="card" href="#regions">Explore Regions</a>
+          <a class="card" href="#popular">Popular Now</a>
+        </div>
+
+        <h3 style="margin-top:26px">Most Popular</h3>
+        <div class="popular">
+          <article class="card">
+            <img src="https://imgs.search.brave.com/Mf6Z_hJIgnz72QtuqdYnh3bwkD5pMmTIt3tXZhgBGR0/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90My5m/dGNkbi5uZXQvanBn/LzA3LzQ5LzQwLzkw/LzM2MF9GXzc0OTQw/OTAyMV85dlF3Y21w/czlIZzJKNUdTMlJY/eTRjdjRLd3JwUWZz/eC5qcGc" alt="Biryani">
+            <h4>Biryani</h4>
+            <p class="meta">Aromatic layered rice with meat or vegetables</p>
+            <div class="rating">⭐⭐⭐⭐☆ <button onclick="openRecipe('biryani')" style="margin-left:auto;border:none;background:#C6532D;padding:6px;border-radius:8px;cursor:pointer">Try Now</button></div>
+          </article>
+          <article class="card">
+            <img src="https://imgs.search.brave.com/JokHURhs94bz79oh-DNS_PpBNSFz64ZUOT7IOc29DgQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90My5m/dGNkbi5uZXQvanBn/LzExLzQ5LzYyLzE4/LzM2MF9GXzExNDk2/MjE4NjBfbUJoS3Jq/dm1vUnRxQ0RqanBC/UHc0WktEVnVwYzlE/UnUuanBn" alt="Paneer Tikka">
+            <h4>Paneer Tikka</h4>
+            <p class="meta">Grilled marinated cottage cheese</p>
+            <div class="rating">⭐⭐⭐⭐☆ <button onclick="openRecipe('paneer_tikka')" style="margin-left:auto;border:none;background:#C6532D;padding:6px;border-radius:8px;cursor:pointer;">Try Now</button></div>
+          </article>
+          <article class="card">
+            <img src="https://imgs.search.brave.com/hcmNjEGGTJWnIHp4zdvvbj-TD5kVh4CD7gc3GVlqOE8/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90My5m/dGNkbi5uZXQvanBn/LzE2LzgwLzQ3LzM0/LzM2MF9GXzE2ODA0/NzM0NzBfNks3M1E0/aWk2VVExb0o1OGYz/TDd0UXlMc0lRUHcx/SlguanBn" alt="Chole Bhature">
+            <h4>Chole Bhature</h4>
+            <p class="meta">Spiced chickpea curry with fried bread</p>
+            <div class="rating">⭐⭐⭐⭐☆ <button onclick="openRecipe('chole')" style="margin-left:auto;border:none;background:#C6532D;padding:6px;border-radius:8px;cursor:pointer">Try Now</button></div>
+          </article>
+        </div>
+      </div>
+
+      <div class="hero-image">
+        <img src="https://imgs.search.brave.com/lUBdIza_Cb2xWD2x-igYUKgfUG3JpYXIvWeWkIIHtPU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5pc3RvY2twaG90/by5jb20vaWQvNDkz/MjI0NzY5L3Bob3Rv/L3RoYWxpLW1lYWwu/anBnP3M9NjEyeDYx/MiZ3PTAmaz0yMCZj/PUJMaE01MU16X0px/RWhaTnZsR09BV1Qz/aTgxam1mNUppTERP/UnJ2ZzNVYlk9" alt="Indian spices and thali">
+      </div>
+    </section>
+
+    <!-- Regions / map -->
+    <section id="regions" class="regions">
+      <h2>Regional Recipes</h2>
+      <p class="meta">Click a region to explore representative dishes and open recipe details.</p>
+      <div class="map-grid">
+        <div class="map-placeholder">
+          <!-- Simple illustrative map + explanation -->
+          <h3>Interactive Map of India (illustration)</h3>
+          <p class="meta">Select a region below — each card opens recipes and photos from that region.</p>
+          <img src="https://imgs.search.brave.com/KxznZSTJ9FGm7RP3IBelnzsHmQWt7QyK8b6CbIIJnSc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90My5m/dGNkbi5uZXQvanBn/LzE2LzE1LzI0LzYw/LzM2MF9GXzE2MTUy/NDYwNjRfVUJjc0ZU/SVg4MUFVNFJWVHdT/MzFEdEdtQWlCSDR4/dE4uanBn" alt="Map of India" style="width:100%;border-radius:10px;margin-top:12px">
+        </div>
+
+        <div>
+          <div class="region-cards">
+            <div class="region" onclick="openRegion('north')">
+              <img src="https://imgs.search.brave.com/pzcoaiH-q95jD87cNj_cd7yF5BuvfppHijJbCUGDR3E/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvMTc2/NTAyNDAzL3Bob3Rv/L2luZGlhLWdhdGUt/YW5kLWNhbm9weS1h/dC1zdW5zZXQuanBn/P3M9NjEyeDYxMiZ3/PTAmaz0yMCZjPWJK/a2JlV2xPbEFBTU5a/anNrb0kyNjNWTlNm/elFZVjNkQkVGUkxF/a1kwSXM9" alt="North India">
+              <h4>North India</h4>
+              <div class="dish-list">Butter Chicken · Rajma Chawal · Paneer Tikka</div>
+            </div>
+
+            <div class="region" onclick="openRegion('south')">
+              <img src="https://imgs.search.brave.com/mxvyw8IJtGyy8BwJStopkRh5fE2UPPtENACXBwkPXp4/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/aG9saWRpZnkuY29t/L2Jsb2cvd3AtY29u/dGVudC91cGxvYWRz/LzIwMTUvMDkvNjQ1/OTEwNTkzNV9iNzJl/ODcwMTUxX2ItMS5q/cGc" alt="South India">
+              <h4>South India</h4>
+              <div class="dish-list">Dosa · Sambar · Hyderabadi Biryani</div>
+            </div>
+
+            <div class="region" onclick="openRegion('east')">
+              <img src="https://imgs.search.brave.com/LxzNAYKROupdHDhlsZgHjmvXlK4ceLoIvqsAIN3g1Cw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMyLnRyaXBvdG8u/Y29tL21lZGlhL2Zp/bHRlci9ubC9pbWcv/MTM1NjA5NC9Ucmlw/RG9jdW1lbnQvMTU1/OTEyNzU3NF8xNTU5/MTI3NTU5OTUyLmpw/Zw" alt="East India">
+              <h4>East India</h4>
+              <div class="dish-list">Rasgulla · Fish Curry · Pakhala</div>
+            </div>
+
+            <div class="region" onclick="openRegion('west')">
+              <img src="https://imgs.search.brave.com/1mGIdaRTXFXl2azdM6Q8u2DwQ5lPZg32nBu4WKd7Zks/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jaGVl/c2V3ZWIuZXUvd3At/Y29udGVudC91cGxv/YWRzLzIwMTYvMDYv/VWRhaXB1ckluZGlh/LmpwZw" alt="West India">
+              <h4>West India</h4>
+              <div class="dish-list">Dhokla · Misal Pav · Goan Fish Curry</div>
+            </div>
+
+            <div class="region" onclick="openRegion('ne')">
+              <img src="https://imgs.search.brave.com/6uN2_5fbNqK1qT-mEgr9rVUAbxb7rFPmyfQatN_WDQ8/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YTIudGhyaWxsb3Bo/aWxpYS5jb20vaW1h/Z2VzL3Bob3Rvcy8w/MDAvMTI4Lzg2OC9v/cmlnaW5hbC8xNTI5/MzE0MzUzX3NodXR0/ZXJzdG9ja18xNzU4/OTk0MjguanBnP2dy/YXZpdHk9Y2VudGVy/JndpZHRoPTc1MiZo/ZWlnaHQ9NDUwJmNy/b3A9ZmlsbCZxdWFs/aXR5PWF1dG8mZmV0/Y2hfZm9ybWF0PWF1/dG8mZmxhZ3M9c3Ry/aXBfcHJvZmlsZSZm/b3JtYXQ9anBnJnNp/Z25fdXJsPXRydWU" alt="Northeast India">
+              <h4>Northeast</h4>
+              <div class="dish-list">Thukpa · Bamboo Shoots · Momos</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gallery -->
+    <section id="gallery" style="margin-top:34px">
+      <h2>Photo Gallery</h2>
+      <p class="meta">HD photos of dishes, spices and cooking techniques.</p>
+      <div class="gallery" style="margin-top:12px">
+        <div class="gallery-item"><img src="https://imgs.search.brave.com/ByeKhr4FDcotclHwAn9_Zo34T5MEWADovcxNT-1s2-U/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzLzBhLzM5/L2VlLzBhMzllZTA4/NjgzZTI1ODA0NGM1/ZWFiMmJmYzgzMzUz/LmpwZw" alt="Gallery1"><div class="caption">Masala Chai</div></div>
+        <div class="gallery-item"><img src="https://imgs.search.brave.com/-Mqq9ccA8O8AnSfEz3Sux27d59lnn3oGvZ9pi9Miso8/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90NC5m/dGNkbi5uZXQvanBn/LzE3LzY5LzM2Lzc5/LzM2MF9GXzE3Njkz/Njc5NDRfc3h4Z1VG/MFFOemJYMzRqamRn/dzBBQ0ZTWUlRQWZ5/N2IuanBn" alt="Gallery2"><div class="caption">Thali</div></div>
+        <div class="gallery-item"><img src="https://imgs.search.brave.com/bpB6wodxTnyUYTV2HRH3-9FjB4svMWtW2O8oj-HC5P0/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90NC5m/dGNkbi5uZXQvanBn/LzE0Lzk0LzMxLzk3/LzM2MF9GXzE0OTQz/MTk3NjdfamJvYzFI/Y01BQnExYnZEUTRP/SUJxenFub1ZwN1g0/eEwuanBn" alt="Gallery3"><div class="caption">Spice Mix</div></div>
+        <div class="gallery-item"><img src="https://imgs.search.brave.com/DnfW4oJBW5luZGr40SEt8I6yytq4tIWtf539Tyjrbmo/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90NC5m/dGNkbi5uZXQvanBn/LzE2LzA0LzEyLzQx/LzM2MF9GXzE2MDQx/MjQxMjdfd1BUTHZh/TXBjRGlkdHhmSUFq/UkZQZkFUbE5Jb3hP/TW8uanBn" alt="Gallery4"><div class="caption">Dosa</div></div>
+        <div class="gallery-item"><img src="https://imgs.search.brave.com/ioxNdZOHsy4l2Zr2i2efvXxlr0xXgMIGzxsbop1UMnM/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5pc3RvY2twaG90/by5jb20vaWQvNTA2/NjI1MTQzL3Bob3Rv/L2thanUta2F0bGkt/My5qcGc_cz02MTJ4/NjEyJnc9MCZrPTIw/JmM9cTRwMG9BaENM/TmRFZUttOGtBclJj/WDdqS2dKU21CX0hh/UnpENV9uVjdMZz0" alt="Gallery5"><div class="caption">Sweets</div></div>
+        <div class="gallery-item"><img src="https://imgs.search.brave.com/u7rVjKxQe5baX4MJXMj_6dyBcQ6OwZWKLYvEb5ajvLM/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90aHVt/YnMuZHJlYW1zdGlt/ZS5jb20vYi9zdHJl/ZXQtdmVuZG9yLWNo/ZWYtY29va3MtaW5k/aWFuLWZvb2QtaW5k/aWEtMzIxOTYzMjM2/LmpwZw" alt="Gallery6"><div class="caption">Street Food</div></div>
+      </div>
+    </section>
+
+    <!-- Popular recipes section (more detailed list) -->
+    <section id="popular" style="margin-top:34px">
+      <h2>Popular Recipes</h2>
+      <p class="meta">Tried-and-loved recipes with quick access to full instructions.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:12px">
+        <!-- Cards will call openRecipe -->
+        <div class="card">
+          <img src="https://imgs.search.brave.com/0Q_nffRqxWjlWo6uQ5AooEs-01GS57vCFEX3qFbspcg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90NC5m/dGNkbi5uZXQvanBn/LzA4LzU2Lzc0Lzgz/LzM2MF9GXzg1Njc0/ODM0MV9XcDlVUTRn/UklWMTlHNnN3VDNw/RzRRakY4NE93Vk9a/dS5qcGc" alt="Butter Chicken">
+          <h4>Butter Chicken</h4>
+          <p class="meta">Origin: Delhi · Difficulty: Medium</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+            <span>⏱ 1 hr</span>
+            <button onclick="openRecipe('butter_chicken')">View</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <img src="https://imgs.search.brave.com/w37RHM2clGeFcGLLUdmFPbMYI0ylhXdPJlKiO_7nfms/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90NC5m/dGNkbi5uZXQvanBn/LzEzLzg5LzcxLzY3/LzM2MF9GXzEzODk3/MTY3NjhfTEtCTEc2/SHZuSHEwczladEs3/VjI4VkVONU5tcEV1/Y1AuanBn" alt="Masala Chai">
+          <h4>Masala Chai</h4>
+          <p class="meta">Origin: Pan-India · Difficulty: Easy</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+            <span>⏱ 15 mins</span>
+            <button onclick="openRecipe('masala_chai')">View</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <img src="https://imgs.search.brave.com/Y1cgedNYRoOrnmeQX322A48kCj6DcpnB6FoZ9zgWPyo/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90NC5m/dGNkbi5uZXQvanBn/LzA1LzkzLzU5LzQ3/LzM2MF9GXzU5MzU5/NDc2Nl9BdTJYejcw/ZUVjQmFNMGJ6Q3J5/ajBYZjhUWG1MVjJw/ay5qcGc" alt="Rasgulla">
+          <h4>Rasgulla</h4>
+          <p class="meta">Origin: Bengal · Difficulty: Medium</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+            <span>⏱ 50 mins</span>
+            <button onclick="openRecipe('rasgulla')">View</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact & Subscribe -->
+    <section id="contact" style="margin-top:34px">
+      <h2>Contact & Subscribe</h2>
+      <div style="display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px">
+        <div class="card">
+          <h4>Contact Us</h4>
+          <form onsubmit="event.preventDefault();alert('Thanks! We\'ll get back to you.')">
+            <input placeholder="Name" required>
+            <input placeholder="Email" type="email" required>
+            <textarea placeholder="Message" rows="4"></textarea>
+            <button type="submit">Send Message</button>
+          </form>
+        </div>
+
+        <div class="card" id="subscribe">
+          <h4>Subscribe to newsletter</h4>
+          <p class="meta">Get weekly recipes, tips & regional specials.</p>
+          <form onsubmit="event.preventDefault();alert('Subscribed!')">
+            <input placeholder="Email address" type="email" required>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button type="submit">Subscribe</button>
+              <button type="button" style="background:#C6532D;color:#ffffff" onclick="document.querySelector('#subscribe input').value=''">Clear</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div>
+          <strong>Flavours of India</strong>
+          <div class="meta">Copyright © 2025 · All rights reserved</div>
+        </div>
+        <div class="socials">
+          <a href="https://www.instagram.com"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" width="50" height="50"></a>
+          <a href="https://www.facebook.com"><img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Facebook_Logo.png" alt="Facebook" width="50" height="50"></a>
+          <a href="https://www.twitter.com"><img src="https://imgs.search.brave.com/nKd3NFbMdj8R87z1rQjwbeGkkfHxaNJhSGoBC4IWSso/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9wZW5q/aS5jby93cC1jb250/ZW50L3VwbG9hZHMv/MjAyMy8wNy9YLWxv/Z28tdHdpdHRlci0x/MDI0eDU3NC5qcGc" alt="Twitter" width="50" height="50"></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Recipe modal -->
+  <div id="modal" class="modal" onclick="if(event.target.id==='modal') closeModal()">
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 id="modal-title">Recipe</h3>
+        <button onclick="closeModal()" style="background:#cc0b0b;border:1px solid #eee;padding:8px;border-radius:8px">Close</button>
+      </div>
+      <div id="modal-content" style="margin-top:12px"> 
+        <!-- populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Minimal dataset of recipes. Add more entries as needed.
+    const recipes = {
+      'biryani':{
+        title:'Hyderabadi Biryani',
+        image:'https://imgs.search.brave.com/EL4LgE2on4yRdRTtpSv9L_GSp4IuTXgH8B5kZ2Hdbqo/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90My5m/dGNkbi5uZXQvanBn/LzA3LzQ2LzM2LzM0/LzM2MF9GXzc0NjM2/MzQ4OV9jS2MxTlpZ/Nnd6SjdESHBHVThr/bjYyS2xWdXZiUEVr/dS5qcGc',
+        origin:'Hyderabad, South India',
+        difficulty:'Medium',
+        time:'1 hr 30 mins',
+        description:'Aromatic layered rice cooked with marinated meat and saffron — a festive favourite.',
+        ingredients:["2 cups Basmati rice","500g chicken (or vegetables)","2 onions","Yogurt, spices, saffron"],
+        steps:["Marinate meat with yogurt and spices.","Par-cook rice with whole spices.","Layer rice and meat, add saffron milk, and dum-cook for 25-30 mins."]
+      },
+      'paneer_tikka':{
+        title:'Paneer Tikka',
+        image:'https://imgs.search.brave.com/UP_N5ELzb1ZnG4xjKk4mrIlBcP_F99vNXYvVma9Eqzk/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90NC5m/dGNkbi5uZXQvanBn/LzE0Lzc4LzYyLzY1/LzM2MF9GXzE0Nzg2/MjY1OTZfcDNQTlNV/a2t6MDJsSHpGeWdL/TnpUblh5WnBKeVJw/RUwuanBn',
+        origin:'North India',
+        difficulty:'Easy',
+        time:'45 mins',
+        description:'Chunks of paneer marinated in spices and grilled to smoky perfection.',
+        ingredients:["300g paneer","Yogurt","Red chilli, garam masala, turmeric","Lemon, oil"],
+        steps:["Cut paneer into cubes and marinate.","Skewer and grill or bake until charred.","Serve with mint chutney."]
+      },
+      'chole':{
+        title:'Chole Bhature',
+        image:'https://imgs.search.brave.com/yG6JfFl3Sw2kj8bUZCvKPqMM6MOOCadldcHtnORhtdg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/cHJlbWl1bS1waG90/by9kZWxpY2lvdXMt/aW5kaWFuLXJlY2lw/ZS1jaG9sZS1iaGF0/dXJlLXNwaWN5LWNo/aWNrcGVhcy13aXRo/LWZyaWVkLWJyZWFk/LWNvbmNlcHQtaW5k/aWFuLWN1aXNpbmUt/Y2hvbGUtYmhhdHVy/ZS1zcGljeS1jaGlj/a3BlYXMtZnJpZWQt/YnJlYWQtcmVjaXBl/Xzg2NDU4OC0xODc0/MDMuanBnP3NlbXQ9/YWlzX2h5YnJpZCZ3/PTc0MCZxPTgw',
+        origin:'Punjab, North India',
+        difficulty:'Medium',
+        time:'1 hr',
+        description:'Spiced chickpea curry paired with deep-fried fluffy bread.',
+        ingredients:["2 cups chickpeas (soaked)","Onion, tomato","Chole masala, ginger-garlic paste"],
+        steps:["Cook chickpeas until tender.","Prepare onion-tomato gravy with spices.","Simmer chickpeas in gravy and serve with bhature."]
+      },
+      'butter_chicken':{
+        title:'Butter Chicken',
+        image:'https://imgs.search.brave.com/f-DjUJUDNRjjjyRE7_gRw9_hVYOA4rvcwChDFhQNYGw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMudmVjdGVlenku/Y29tL3N5c3RlbS9y/ZXNvdXJjZXMvdGh1/bWJuYWlscy8wNDgv/MzQxLzAyNC9zbWFs/bC9jaGlja2VuLXBh/cHJpa2FzaC1mcmVz/aC1mb29kcy1pbi1t/aW5pbWFsLXN0eWxl/LXBob3RvLmpwZw',
+        origin:'Delhi, North India',
+        difficulty:'Medium',
+        time:'1 hr',
+        description:'Creamy tomato-based curry with tender chicken pieces, buttery and mildly spiced.',
+        ingredients:["500g chicken","Tomato puree","Cream, butter, kasuri methi"],
+        steps:["Marinate and cook chicken.","Make tomato gravy, add butter and cream.","Combine chicken and simmer."]
+      },
+      'masala_chai':{
+        title:'Masala Chai',
+        image:'https://imgs.search.brave.com/vvzipA4XLJMQsM-7PUYTieEsIvpR1T8JcKlKkPwGvGc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90My5m/dGNkbi5uZXQvanBn/LzA0LzM1LzAyLzQw/LzM2MF9GXzQzNTAy/NDAyMV9aRDM3RkF6/NEVJRDZUelZ1TWZL/djcxeUY4QmNVZUFP/My5qcGc',
+        origin:'Pan-India',
+        difficulty:'Easy',
+        time:'15 mins',
+        description:'Spiced milk tea made with black tea leaves, milk, and warming spices.',
+        ingredients:["2 cups water","1 cup milk","2 tsp tea leaves","Cardamom, ginger, cinnamon"],
+        steps:["Boil water with spices.","Add tea leaves and simmer.","Add milk and sugar, bring to boil and strain."]
+      },
+      'rasgulla':{
+        title:'Rasgulla',
+        image:'\https://imgs.search.brave.com/THstCv9JE664OGi78gsDrcXSwS0Ko6PmqWb-GqGia1Q/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90My5m/dGNkbi5uZXQvanBn/LzE2LzA3LzM5LzA4/LzM2MF9GXzE2MDcz/OTA4MjhfUzQ4dFYy/M1JIR2hlWkczNEdu/dkNjQ29iNTRDQWpK/S1cuanBn',
+        origin:'Bengal, East India',
+        difficulty:'Medium',
+        time:'50 mins',
+        description:'Soft spongy cheese balls cooked in light sugar syrup.',
+        ingredients:["1 litre milk","2 tbsp lemon juice","2 cups sugar","Water"],
+        steps:["Curdle milk and make chenna (cheese).","Knead into smooth balls and cook in sugar syrup.","Cool and serve chilled."]
+      },
+      'thukpa':{
+        title:'Thukpa',
+        image:'https://imgs.search.brave.com/OtzZKeastu7APaZ9RHTMRCSp9xOxrjJiYHUKKA7oghE/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90My5m/dGNkbi5uZXQvanBn/LzE2LzY2Lzc3LzA0/LzM2MF9GXzE2NjY3/NzA0MTBfMkowMVJS/Z2ZCdjRzYmgyOGk3/UXl3NlpzT0hlWEY1/V3ouanBn',
+        origin:'Northeast India',
+        difficulty:'Easy',
+        time:'35 mins',
+        description:'Noodle soup with vegetables and a light, comforting broth.',
+        ingredients:["Noodles","Vegetable broth","Mixed vegetables, ginger, garlic"],
+        steps:["Sauté aromatics, add vegetables and broth.","Cook noodles separately and add.","Simmer briefly and serve hot."]
+      }
+    };
+
+    function openRecipe(key){
+      const r = recipes[key];
+      if(!r){alert('Recipe not found');return}
+      const modal = document.getElementById('modal');
+      document.getElementById('modal-title').innerText = r.title;
+      const content = document.getElementById('modal-content');
+      content.innerHTML = `
+        <div class="modal-grid">
+          <div>
+            <img src="${r.image}" alt="${r.title}" style="width:100%;border-radius:10px;object-fit:cover;max-height:420px">
+            <p style="margin-top:8px">${r.description}</p>
+            <div class="meta">Origin: ${r.origin} · Difficulty: ${r.difficulty} · Time: ${r.time}</div>
+          </div>
+          <div>
+            <div class="ingredients">
+              <h4>Ingredients</h4>
+              <ul>${r.ingredients.map(i=>`<li>${i}</li>`).join('')}</ul>
+            </div>
+            <div style="margin-top:10px">
+              <h4>Steps</h4>
+              <ol>${r.steps.map(s=>`<li>${s}</li>`).join('')}</ol>
+            </div>
+            <div style="margin-top:10px;color:var(--muted)">
+              <h5>Tips & Variations</h5>
+              <p>Adjust spice levels to taste. For vegetarian variations, swap meats with paneer or vegetables. Use fresh spices for best aroma.</p>
+            </div>
+          </div>
+        </div>
+      `;
+      modal.classList.add('open');
+      // ensure modal scroll top
+      modal.scrollTop = 0;
+    }
+
+    function closeModal(){document.getElementById('modal').classList.remove('open')}
+
+    function openRegion(region){
+      // sample mapping region -> recipes
+      const map = {
+        'north':['butter_chicken','paneer_tikka','chole'],
+        'south':['biryani','masala_chai'],
+        'east':['rasgulla'],
+        'west':['paneer_tikka','biryani'],
+        'ne':['thukpa']
+      };
+      const keys = map[region]||[];
+      if(!keys.length){alert('No recipes available for this region yet');return}
+      // build HTML list
+      const items = keys.map(k=>{
+        const r = recipes[k];
+        return `<div style=\"display:flex;gap:12px;align-items:center;margin-bottom:12px\">\n                  <img src=\"${r.image}\" alt=\"${r.title}\" style=\"width:120px;height:80px;object-fit:cover;border-radius:8px\">\n                  <div>\n                    <strong>${r.title}</strong><div style=\"color:var(--muted)\">${r.origin} · ${r.time}</div>\n                    <div style=\"margin-top:6px\"><button onclick=\"openRecipe('${k}')\">Open</button></div>\n                  </div>\n                </div>`;
+      }).join('');
+
+      const modal = document.getElementById('modal');
+      document.getElementById('modal-title').innerText = 'Regional picks';
+      document.getElementById('modal-content').innerHTML = `<div>${items}</div>`;
+      modal.classList.add('open');
+    }
+
+    // Accessibility: close modal with Escape
+    document.addEventListener('keydown',(e)=>{if(e.key==='Escape') closeModal()});
+  </script>
+</body>
+</html>
